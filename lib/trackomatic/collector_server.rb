@@ -41,11 +41,7 @@ require 'digest/md5'
     def record_request
       e = env
       puts e['rack.session'].inspect
-      previous_id = nil
       EM.next_tick do
-        res = e.mongo.first({"session" => e['rack.session']['user_id']}, {:order => "date"})
-        previous_id = res['_id'] if res
-        puts previous_id
         doc = {
           request: {
           http_method: e[Goliath::Request::REQUEST_METHOD],
@@ -53,11 +49,9 @@ require 'digest/md5'
           headers: e['client-headers'],
           params: e.params
         },
-          session: e['rack.session']['user_id'],
           date: Time.now.to_i,
-          previous_id: previous_id
         }
-        e.mongo.insert(doc)
+        e.mongo.update({ session: e['rack.session']['user_id'] }, { "$push" => { requests: doc } }, { upsert: true } )
       end
     end
   end

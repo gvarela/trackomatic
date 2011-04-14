@@ -7,7 +7,7 @@ gemspec
 # gem   'eventmachine'
 gem 'em-http-request',    '1.0.0.beta.3'
 gem 'em-mongo'
-gem 'em-synchrony'
+gem 'em-synchrony', :git => 'https://github.com/igrigorik/em-synchrony.git'
 gem 'goliath'
 
 
