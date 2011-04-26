@@ -40,18 +40,17 @@ require 'digest/md5'
 
     def record_request
       e = env
-      puts e['rack.session'].inspect
       EM.next_tick do
         doc = {
-          request: {
           http_method: e[Goliath::Request::REQUEST_METHOD],
-          path: e[Goliath::Request::REQUEST_PATH],
+          tracking_pixel_path: e[Goliath::Request::REQUEST_PATH],
           headers: e['client-headers'],
-          params: e.params
-        },
+          params: e.params,
+          tracked_uri: e['client-headers']['Referer'],
+          params: e.params,
           date: Time.now.to_i,
         }
-        e.mongo.update({ session: e['rack.session']['user_id'] }, { "$push" => { requests: doc } }, { upsert: true } )
+        e.mongo.update({ session: e['rack.session']['user_id'] }, {'$push' =>  {requests: doc }}, { upsert: true })
       end
     end
   end
